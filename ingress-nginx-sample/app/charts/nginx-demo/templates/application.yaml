@@ -1,0 +1,91 @@
+{{- $chart := printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.project.artifactId }}-deployment
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.project.artifactId }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    helm.sh/chart: {{ $chart }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 15
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Values.project.artifactId }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Values.project.artifactId }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: nginx-demo-container
+          image: docker.io/nginx:latest
+          imagePullPolicy: Always
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - containerPort: {{ .Values.project.dockerPort }}
+              name: service-port
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 200m
+            limits:
+              memory: 512Mi
+              cpu: 400m
+          livenessProbe:
+            httpGet:
+              path: /
+              port: service-port
+            initialDelaySeconds: 5
+            periodSeconds: 120
+            timeoutSeconds: 5
+            failureThreshold: 1
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /
+              port: service-port
+            initialDelaySeconds: 5
+            periodSeconds: 300
+            timeoutSeconds: 5
+            failureThreshold: 1
+            successThreshold: 1
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/Pacific/Auckland
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.project.artifactId }}-service
+  namespace: {{ .Values.project.namespace }}
+  labels:
+    app.kubernetes.io/name: {{ .Values.project.artifactId }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    helm.sh/chart: {{ $chart }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ .Values.project.artifactId }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: {{ .Values.project.servicePort }}
+      targetPort: {{ .Values.project.dockerPort }}

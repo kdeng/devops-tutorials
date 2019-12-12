@@ -1,0 +1,4 @@
+project:
+  artifactId: app-demo
+  dockerPort: 8080
+  servicePort: 8082

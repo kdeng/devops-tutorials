@@ -1,0 +1,21 @@
+apiVersion: v1
+name: app-demo
+version: 1.1
+AppVersion: 1.2
+icon: https://www.google.com/a/cpanel/connectedjourneys.co.nz/images/logo.gif?service=google_gsuite
+home: https://github.com/Connected-Journeys
+sources:
+  - http://www.connectedjourneys.co.nz
+description: MaaS Platform Edge API Service
+maintainers:
+  - name: mobilityos
+    email: mobilityos@connectedjourneys.co.nz
+keywords:
+  - Connected Journeys
+  - MaaS
+  - mobilityOS
+  - backend
+  - Platform
+  - edge-api
+  - api-service
+  - edge-api-service

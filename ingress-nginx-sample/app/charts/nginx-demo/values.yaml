@@ -1,0 +1,4 @@
+project:
+  artifactId: nginx-demo
+  dockerPort: 80
+  servicePort: 8081
