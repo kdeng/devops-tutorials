@@ -1,0 +1,6 @@
+project:
+  artifactId: app-demo
+  dockerPort: 8080
+  servicePort: 9091
+  containerName: app-demo-container
+  dockerImageFullName: docker.io/kdeng/app-demo:1.1

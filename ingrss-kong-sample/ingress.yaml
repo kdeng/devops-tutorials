@@ -1,0 +1,20 @@
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: app-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "kong"
+spec:
+  rules:
+    - http:
+        paths:
+        - path: /nginx
+          backend:
+            serviceName: nginx-demo-service
+            servicePort: 9092
+        - path: /app
+          backend:
+            serviceName: app-demo-service
+            servicePort: 9091

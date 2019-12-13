@@ -1,0 +1,42 @@
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongIngress
+metadata:
+  name: kongingress-api
+  namespace: default
+proxy:
+  path: /app/
+route:
+  strip_path: false
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: myservice-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "kong"
+    configuration.konghq.com: "kongingress-api"
+spec:
+  rules:
+  - http:
+      paths:
+        - path: /app/
+          backend:
+            serviceName: app-demo-service
+            servicePort: rest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myservice
+  namespace: default
+  annotations:
+     configuration.konghq.com: "kongingress-api"
+spec:
+  ports:
+  - name: rest
+    port: 9093
+    protocol: TCP
+    targetPort: 8080
+  #type: ClusterIP
