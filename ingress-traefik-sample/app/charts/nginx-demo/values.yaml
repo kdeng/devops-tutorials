@@ -1,0 +1,6 @@
+project:
+  artifactId: nginx-demo
+  dockerPort: 80
+  servicePort: 9092
+  containerName: nginx-demo-container
+  dockerImageFullName: docker.io/nginx:latest

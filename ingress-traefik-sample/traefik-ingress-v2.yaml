@@ -1,0 +1,59 @@
+# apiVersion: traefik.containo.us/v1alpha1
+# kind: Middleware
+# metadata:
+#   name: basicauth
+#   namespace: default
+# spec:
+#   basicAuth:
+#     users:
+#       - test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/
+#       - test2:$apr1$d9hr9HBB$4HxwgUir3HP4EsggP/QNo0
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ingressroutebar
+  namespace: default
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: PathPrefix(`/app`)
+    kind: Rule
+    services:
+    - name: app-demo-service
+      kind: Service
+      port: 9091
+    middlewares:
+      - name: app-demo-stripprefix
+  - match: PathPrefix(`/nginx`)
+    kind: Rule
+    services:
+    - name: nginx-demo-service
+      kind: Service
+      port: 9092
+    middlewares:
+      - name: nginx-demo-stripprefix
+    # middlewares:
+    # - name: basicauth
+    #   namespace: foo
+
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: nginx-demo-stripprefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /nginx
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: app-demo-stripprefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /app

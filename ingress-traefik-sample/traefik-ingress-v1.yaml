@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: app-ingress
+  namespace: kube-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - http:
+        paths:
+        - path: /app
+          backend:
+            serviceName: app-demo-service
+            servicePort: 9091
+        - path: /nginx
+          backend:
+            serviceName: nginx-demo-service
+            servicePort: 9092
