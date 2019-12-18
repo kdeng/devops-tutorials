@@ -1,0 +1,57 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: helloworld-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: helloworld-service-entry
+spec:
+  hosts:
+  - helloworld
+  location: MESH_INTERNAL
+  ports:
+  - number: 5000
+    name: http
+    protocol: HTTP
+  resolution: DNS
+  endpoints:
+  - address: helloworld
+    ports:
+      http: 5000
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: helloworld-virtual-service
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - helloworld-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: helloworld
+        port:
+          number: 5000
+
+  # - route:
+  #   - destination:
+  #       host: helloworld
+  #       subset: v1

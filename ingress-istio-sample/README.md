@@ -20,12 +20,30 @@ istioctl manifest apply --set values.global.mtls.enabled=true --set values.globa
 ## Install application
 
 ```bash
-kubectl apply -f <(istioctl kube-inject -f helloworld.yaml)
+kubectl apply -f <(istioctl kube-inject -f 01-helloworld-deployment.yaml)
 ```
 
-## Install gateway
+## Install gateways
+
+### Install gateway for single service
 
 ```bash
-kubectl apply -f helloworld-gateway.yaml
+kubectl apply -f 02-helloworld-gateway-v1.yaml
 ```
 
+### Install gateway for mutiple subsets
+
+```bash
+kubectl apply -f 02-helloworld-gateway-v2.yaml
+```
+
+### Install external proxy gateway
+
+```bash
+kubectl apply -f 03-httpbin-gateway.yaml
+```
+
+```bash
+# Test
+curl http://<INGRESS-IP>:<PORT>/status/418 -Hhost:httpbin.org
+```
