@@ -1,0 +1,74 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: external-webservice-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default ingress gateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: external-webservice-service-entry
+spec:
+  hosts:
+  - external-webservice-external-service
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+  resolution: STATIC
+  location: MESH_EXTERNAL
+  endpoints:
+  - address: <external-ip>
+    ports:
+      http: 80
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: external-webservice-virtual-service
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - external-webservice-gateway
+  http:
+  - match:
+    - gateways:
+      - external-webservice-gateway
+      port: 80
+      uri:
+        prefix: /
+    route:
+    - destination:
+        host: external-webservice-external-service
+        port:
+          number: 80
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: external-webservice-external-service
+subsets:
+  - addresses:
+      - ip: <external-ip>
+    ports:
+      - port: 8080
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: external-webservice-external-service
+spec:
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
