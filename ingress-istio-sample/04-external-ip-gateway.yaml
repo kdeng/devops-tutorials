@@ -27,7 +27,7 @@ spec:
   resolution: STATIC
   location: MESH_EXTERNAL
   endpoints:
-  - address: <external-ip>
+  - address: #EXTERNAL_IP#
     ports:
       http: 80
 ---
@@ -59,7 +59,7 @@ metadata:
   name: external-webservice-external-service
 subsets:
   - addresses:
-      - ip: <external-ip>
+      - ip: #EXTERNAL_IP#
     ports:
       - port: 8080
 ---
