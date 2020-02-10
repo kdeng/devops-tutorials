@@ -9,22 +9,22 @@ resource "random_integer" "master-build-cidr_range_c" {
   max = 254
 }
 
-# resource "google_compute_network" "container_network" {
-#   project                 = var.project.id
-#   name                    = "container-network"
-#   auto_create_subnetworks = false
-# }
+resource "google_compute_network" "container_network" {
+  project                 = var.project.id
+  name                    = var.gke_container_network.network_name
+  auto_create_subnetworks = false
+}
 
-# resource "google_compute_subnetwork" "container_subnetwork" {
-#   project = var.project.id
-#   name          = "container-subnetwork"
-#   description   = "auto-created subnetwork for cluster \"my-cluster\""
-#   ip_cidr_range = "10.2.0.0/16"
-#   region        = var.project.region
-#   network       = google_compute_network.container_network.self_link
+resource "google_compute_subnetwork" "container_subnetwork" {
+  project = var.project.id
+  name          = var.gke_container_network.subnetwork_name
+  description   = "auto-created subnetwork for cluster ${var.gke_cluster_setting.name}"
+  ip_cidr_range = "10.2.0.0/16"
+  region        = var.project.region
+  network       = google_compute_network.container_network.self_link
 
-#   depends_on = [google_compute_network.container_network]
-# }
+  depends_on = [google_compute_network.container_network]
+}
 
 resource "google_container_cluster" "primary" {
   provider = google-beta
@@ -58,10 +58,10 @@ resource "google_container_cluster" "primary" {
 
   }
 
-  network     = "projects/${var.project.id}/global/networks/${var.gke_cluster_setting.network_name}"
-  subnetwork  = "projects/${var.project.id}/regions/${var.project.region}/subnetworks/${var.gke_cluster_setting.subnetwork_name}"
-  # network    = google_compute_network.container_network.name
-  # subnetwork = google_compute_subnetwork.container_subnetwork.name
+  # network     = "projects/${var.project.id}/global/networks/${var.gke_cluster_setting.network_name}"
+  # subnetwork  = "projects/${var.project.id}/regions/${var.project.region}/subnetworks/${var.gke_cluster_setting.subnetwork_name}"
+  network    = google_compute_network.container_network.name
+  subnetwork = google_compute_subnetwork.container_subnetwork.name
 
   ip_allocation_policy {
     use_ip_aliases           = true
@@ -133,3 +133,46 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
   depends_on = [google_container_cluster.primary]
 
 }
+
+
+# resource "google_container_node_pool" "primary_preemptible_nodes" {
+#   project = var.project.id
+#   name       = var.gke_cluster_setting.node_pool_name
+#   location   = var.gke_cluster_setting.location
+#   cluster    = google_container_cluster.primary.name
+
+#   node_count  = var.gke_cluster_setting.min_node_size
+
+#   autoscaling {
+#     min_node_count = var.gke_cluster_setting.min_node_size
+#     max_node_count = var.gke_cluster_setting.max_node_size
+#   }
+
+#   node_config {
+#     preemptible  = var.gke_cluster_setting.preemptible
+#     machine_type = var.gke_cluster_setting.node_pool_machine_type
+
+#     metadata = {
+#       disable-legacy-endpoints = true
+#     }
+
+#     oauth_scopes = [
+#       "https://www.googleapis.com/auth/cloud-platform",
+#       # "https://www.googleapis.com/auth/logging.write",
+#       # "https://www.googleapis.com/auth/monitoring",
+#       # "https://www.googleapis.com/auth/servicecontrol",
+#       # "https://www.googleapis.com/auth/trace.append",
+#       # "https://www.googleapis.com/auth/cloud-platform.read-only",
+#       # "https://www.googleapis.com/auth/devstorage.read_only",
+#       # "https://www.googleapis.com/auth/service.management.readonly"
+#     ]
+#   }
+
+#   management {
+#     auto_repair  = "true"
+#     auto_upgrade = "true"
+#   }
+
+#   depends_on = [google_container_cluster.primary]
+
+# }

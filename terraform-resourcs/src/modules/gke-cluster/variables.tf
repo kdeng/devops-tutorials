@@ -21,3 +21,7 @@ variable "project" {
 variable "gke_cluster_setting" {
   type = map
 }
+
+variable "gke_container_network" {
+  type = map
+}

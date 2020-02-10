@@ -4,12 +4,6 @@ This is the core repository to achieve infrastructure as code.
 
 ## Build platform
 
-### Pull latest terraform state from GCS
-
-```bash
-  gsutil -m cp -r "gs://infrastructure-terraform-state/*" ./
-```
-
 ### List terraform workspace
 
 ```bash

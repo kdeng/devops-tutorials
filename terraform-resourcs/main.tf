@@ -3,18 +3,18 @@ terraform {
   required_version = ">= 0.12"
 }
 
-module "build-platform-builder" {
-  source = "./platform/terraform/build-platform-builder"
-  credentials = var.credentials
-}
+# module "platform" {
+#   source = "./src/platform"
+#   credentials = var.credentials
+# }
 
-module "build-platform-dev" {
-  source = "./platform/terraform/build-platform-dev"
-  credentials = var.credentials
-}
+# module "dev" {
+#   source = "./src/dev"
+#   credentials = var.credentials
+# }
 
 module "playground" {
-  source = "./platform/terraform/playground"
+  source = "./src/playground"
   credentials = var.credentials
 }
 

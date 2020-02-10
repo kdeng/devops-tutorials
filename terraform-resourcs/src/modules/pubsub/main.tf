@@ -32,7 +32,7 @@ resource "google_pubsub_subscription" "subscription_two" {
   ack_deadline_seconds = var.subscription_two__settings.ack_deadline_seconds
 
   labels = {
-\  }
+  }
 
   # We are using pull subscription strategy
   message_retention_duration = var.subscription_two__settings.message_retention_duration

@@ -1,0 +1,18 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: k-006-fly
+  namespace: cka
+spec:
+  podSelector:
+    matchLabels:
+      role: k-1-fly-role
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 10.0.0.0/16
+        except:
+        - 10.0.2.5/32
